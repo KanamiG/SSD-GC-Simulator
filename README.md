@@ -1,141 +1,173 @@
 # SSD GC Simulator
 
-A deterministic **C++20 educational simulator** for page-mapped flash translation
-(FTL), out-of-place logical page writes, and block-level garbage collection.
-This project simulates *metadata*, not real NAND hardware or timing.
+[![CI](https://github.com/KanamiG/SSD-GC-Simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/KanamiG/SSD-GC-Simulator/actions/workflows/ci.yml)
 
-> Project status: **v0.1 development snapshot**. The core library, tests, and
-> experimental benchmark executables and a configurable CLI work. Automated
-> CI, a stable release process, and final documentation are planned for v1.0.
+A **C++20 educational SSD garbage-collection simulator** with a page-mapped
+flash translation layer (FTL), three garbage-collection policies, configurable
+write workloads, a command-line interface, and CSV export.
+
+**Status:** pre-v1.0 development release (`project(... VERSION 0.1.0)` in CMake).
+This is an **in-memory, metadata-only simulation**, not a NAND controller,
+hardware emulator, or model of SSD performance in real time.
 
 ## Features
 
-- Flash blocks with Free / Valid / Invalid page states and erase counters.
-- Sequential physical page programming and logical-to-physical page mapping.
-- Out-of-place updates with invalidation and managed GC page relocation.
-- Greedy, FIFO, and wear-aware greedy GC victim selection.
-- Deterministic Sequential, Random, and HotCold write workloads.
-- WAF, GC relocation writes, erase counts, and CSV benchmark export.
-- Reproducible experimental workloads and Python statistical analysis.
+- Free / Valid / Invalid pages; sequential physical programming and block erase.
+- Out-of-place host updates with LPN-to-PPA mapping and valid-page relocation.
+- GC victim selection: **Greedy**, **FIFO**, and **Wear-aware Greedy**.
+- Write workloads: **Sequential**, **Random**, and **HotCold**.
+- Metrics: WAF, host/GC physical programs, GC cycles, block erases, erase CV.
+- `ssd_sim` CLI, append-only CSV result rows, optional batch experiments.
+- CTest regression suite and optional Python experiment analysis.
 
 ## Requirements
 
-- CMake 3.16+
-- C++20 compiler (tested in this audit with GCC on Linux; previously tested with Apple Clang on macOS)
-- Python 3 with `pip` (optional, for analysis scripts)
+- A C++20 compiler and CMake **3.16+**.
+- Optional: Python 3.12 and `pip` for the maintained analysis script.
 
-## Build and test
+Linux (GCC/Clang) is covered by automatic CI. macOS (Apple Clang) has been
+tested locally; hosted macOS CI is available as a *manual* workflow while
+GitHub runner availability is unreliable. See [CI setup](docs/CI_SETUP.md).
 
-```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build -j 4
+## Quick start
+
+From the repository root:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
-```
-
-The repository now has **34 CTest cases**: 22 core tests and 12 CLI
-integration checks (including invalid inputs and same-seed reproducibility).
-
-## Run the simulator
-
-```bash
 ./build/ssd_sim --help
-./build/ssd_sim --blocks 32 --pages-per-block 16 \
-    --logical-pages 480 --writes 10000 --workload hotcold \
-    --policy wear-aware --lambda 0.05 --seed 42
 ```
 
-Supported workloads: `sequential`, `random`, `hotcold`.
-Supported GC policies: `greedy`, `fifo`, `wear-aware`.
-For `hotcold` you can set `--hot-set-size` and `--hot-probability`.
-The CLI checks geometry, logical-capacity limits, numeric parameters, and
-incompatible options before running. A successful simulation prints WAF,
-GC relocation writes, GC cycles, erase counts, erase CV, and other counters.
+There are currently **34 CTest cases** (22 core and 12 CLI tests). CTest is
+part of the default build via CMake's `BUILD_TESTING` option.
 
-Return codes: `0` for successful completion/help, `2` for invalid arguments or
-other exceptions, `3` when a valid simulation has unsuccessful host writes.
-The CLI can also append a simulation result to a CSV file with `--csv FILE`:
+### Run a simulation
 
-```bash
-./build/ssd_sim --workload hotcold --policy wear-aware --lambda 0.05 \
-    --csv results/cli_runs.csv
+```sh
+./build/ssd_sim \
+  --blocks 32 \
+  --pages-per-block 16 \
+  --logical-pages 480 \
+  --writes 10000 \
+  --workload hotcold \
+  --hot-set-size 40 \
+  --hot-probability 0.8 \
+  --policy wear-aware \
+  --lambda 0.05 \
+  --seed 42
+```
+
+The output includes the effective configuration, successful and failed writes,
+WAF, physical programs, GC cycles, and block wear statistics. **The numerical
+results can differ between C++ standard-library implementations**, even with
+the same seed (see [Reproducibility](#reproducibility)).
+
+### CLI options
+
+| Option | Meaning | Default |
+| --- | --- | --- |
+| `--blocks N` | Number of erase blocks, at least 2 | `32` |
+| `--pages-per-block N` | Pages per block, at least 1 | `16` |
+| `--logical-pages N` | Workload LPN range size | `480` |
+| `--writes N` | Host write requests; zero allowed | `10000` |
+| `--workload NAME` | `sequential`, `random`, `hotcold` | `random` |
+| `--policy NAME` | `greedy`, `fifo`, `wear-aware` | `greedy` |
+| `--lambda X` | Nonnegative wear weight; wear-aware only | `0` |
+| `--seed N` | Unsigned workload RNG seed | `42` |
+| `--hot-set-size N` | Hot LPN count; HotCold only | `40` |
+| `--hot-probability X` | Hot-access probability strictly between 0 and 1; HotCold only | `0.8` |
+| `--csv FILE` | Append one simulation row to CSV | Disabled |
+| `--help` | Show CLI help | — |
+
+The FTL reserves one block's worth of **logical capacity**:
+`logical_pages <= (blocks - 1) * pages_per_block`. `--logical-pages` describes
+the possible LPN *address range*, not the number of currently mapped LPNs.
+HotCold additionally requires `1 <= hot_set_size < logical_pages`.
+
+**Exit status:** `0` on success/help, `2` on invalid inputs or runtime
+exceptions, `3` if a valid run has unsuccessful host writes.
+
+### CSV export
+
+```sh
 ./build/ssd_sim --workload random --policy greedy \
-    --csv results/cli_runs.csv
+  --seed 42 --csv results/cli_runs.csv
+./build/ssd_sim --workload hotcold --policy wear-aware --lambda 0.05 \
+  --seed 42 --csv results/cli_runs.csv
 ```
 
-The first invocation creates a header; subsequent invocations append one row.
-Parent directories are created automatically. Existing CSVs with a different
-header are rejected rather than mixed with incompatible data. Columns include
-configuration and physical/GC metrics; WAF and success rate are empty when
-undefined (`--writes 0`). CSV append is not concurrent-writer safe.
-Use a separate filename from the historical `wear_weight_sensitivity.csv`
-experiment, whose schema is different. The existing library CSV exporter is
-not changed.
+The first invocation creates the parent directory and writes a 26-column
+header; later invocations append one row without replacing earlier results.
+Existing files with a mismatched header or an incomplete final line are
+rejected. Do **not** have multiple processes write to the same CSV concurrently.
+Undefined rates (e.g. WAF with `--writes 0`) are written as empty fields.
 
+**Important:** this 26-column CLI CSV is **not** the same schema as
+`results/wear_weight_sensitivity.csv` from the experiment runner. The maintained
+Python analyzer only accepts the latter. See [Metrics](docs/METRICS.md) and
+[Python analysis](scripts/README.md).
 
-## Optional experiments
+## Optional research experiments and Python analysis
 
-Experiments are excluded from the normal build. To build them:
-
-```bash
-cmake -S . -B build-exp -DBUILD_TESTING=OFF -DSSD_BUILD_EXPERIMENTS=ON
-cmake --build build-exp -j 4
-```
-
-Examples (run from the repository root; the experiment creates `results/`):
-
-```bash
+```sh
+cmake -S . -B build-exp -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_TESTING=OFF -DSSD_BUILD_EXPERIMENTS=ON
+cmake --build build-exp --parallel 4
 ./build-exp/experiment_wear_weight
 python -m pip install -r requirements-analysis.txt
 python scripts/analyze_wear_weight.py
 ```
 
-The maintained analyzer requires the **320-run experiment CSV** (not the
-separate 26-column output of `ssd_sim --csv`). Its input, output schemas, and
-legacy analysis scripts are documented in [scripts/README.md](scripts/README.md).
-To run the optional Python analysis regression checks:
+The wear-weight experiment produces **320 configurations**: four logical-page
+counts, two workloads, five seeds, and eight policy/weight combinations.
+The analyzer validates that specific design and creates four summary CSV files
+and 10 PNG plots under the ignored `results/` directory. Its regression tests
+use **synthetic fixtures**, not physical SSD measurements:
 
-```bash
+```sh
 python -m unittest discover -s tests -p 'test_analysis_*.py' -v
 ```
 
-The wear-weight experiment currently runs 320 combinations of four logical
-address-space sizes, two workload types, five seeds, and eight policies/weights.
-Results and generated plots live under `results/`, ignored by Git.
+Historical scripts are preserved under `scripts/legacy/`; legacy trace
+experiments may rely on toolchain-specific RNG event indices and are excluded
+from the default experiment build. See [Python analysis](scripts/README.md).
 
-Two historical trace diagnostics are excluded by default because they rely on
-specific event indices observed with an earlier macOS/libc++ random sequence.
-They can be built with `-DSSD_BUILD_LEGACY_TRACES=ON` **together with**
-`-DSSD_BUILD_EXPERIMENTS=ON`, but their hard-coded expected events are not
-portable across standard-library RNG implementations.
+## Repository layout
 
-Other experimental executables are development tools, not stable APIs.
+```text
+include/ssd/      Public C++ library headers
+src/              Block, Flash, FTL, workload, benchmark, CSV implementation
+apps/ssd_sim.cpp  User-facing CLI executable
+tests/            Core, CLI integration, and Python regression tests
+experiments/      Optional batch and diagnostic executables
+scripts/          Maintained analyzer and archived legacy scripts
+docs/             Architecture, metrics, CI and release process
+```
 
-## Layout
+## Design and limitations
 
-- `include/ssd/`: public C++ headers
-- `src/`: simulator core implementation only
-- `apps/ssd_sim.cpp`: command-line application
-- `experiments/`: optional benchmark and historical diagnostic executables
-- `tests/`: self-contained CTest executables
-- `scripts/`: maintained Python analysis, archived historical scripts and migration helper
-- `docs/DESIGN.md`: architecture and model assumptions
+The simulated model uses **metadata rather than user-data payloads**. It omits
+NAND timing, channels, ECC, read/trim, concurrent I/O, wear-out failures,
+power-loss recovery, and production-grade free-block management. WAF and erase
+statistics should not be interpreted as measured SSD lifetime or latency.
 
-## Model limitations
+- [Architecture and GC policies](docs/DESIGN.md)
+- [Metric definitions and CSV interpretation](docs/METRICS.md)
+- [CI and macOS runner limitations](docs/CI_SETUP.md)
+- [Release validation checklist](docs/RELEASING.md)
 
-- Metadata-only page model; no real data payload or read/trim interface.
-- No NAND operation latency, ECC, wear-out failures, channels or concurrency.
-- `FTL::logicalCapacity()` reserves one block worth of pages; the workload's
-  `logical_page_count` is an address-range parameter, not measured occupancy.
-- WAF and erase-count dispersion are *simulation metrics*, not device lifetime
-  or real-world latency predictions.
-- C++ standard-library random distribution implementations can vary across
-  toolchains; seed-based reproducibility is within a fixed implementation.
+## Reproducibility
 
-See [Design](docs/DESIGN.md) for details.
+The same seed and toolchain/standard-library implementation yield repeatable
+workload sequences. Different standard libraries can implement random
+distributions differently, so **identical seeds do not guarantee identical
+cross-platform WAF or GC traces**. Record the compiler, standard library,
+workload parameters, and seed when comparing results; use a common workload
+and seed when comparing GC policies.
 
-## Roadmap to v1.0
+## License
 
-Completed: core reliability regression tests, configurable CLI, CSV export, and
-separate `apps/`, `src/`, `experiments/`, and `tests/` directories.
-
-Still planned: GitHub Actions, stable documentation, license, and release validation.
+MIT — see [LICENSE](LICENSE). If publishing under a different license, replace
+`LICENSE` and update this section **before creating the release tag**.
