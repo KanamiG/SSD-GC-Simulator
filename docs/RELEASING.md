@@ -1,82 +1,105 @@
-# Release checklist (pre-v1.0)
+# Release candidate checklist — v1.0.0
 
-**Current status:** CMake project version `0.1.0`. This checklist describes
-how to *prepare* a future v1.0.0 release. Completing a commit is not the same
-as publishing a tagged release.
+The CMake project version is now **1.0.0**, but this repository remains a
+**release candidate until a `v1.0.0` tag and GitHub Release are created**.
+Do not claim the official release is published until those actions are complete.
 
-## 1. Verify scope and repository hygiene
+## 1. Confirm rights, repository scope and history
 
-- Confirm the intended public API and CLI options are frozen for v1.0.
-- Verify that `LICENSE` uses the intended copyright holder and the project
-  owner has the rights to distribute **all included source code** under MIT.
-- Confirm `.venv/`, `build*/`, and `results/` are ignored and not tracked on
-  `main`. Excluding files now does **not remove them from earlier Git history**.
-- Review historical commits for accidental credentials or private content;
-  if any secret was committed, **revoke/rotate it** before history cleanup.
-- Do not use `git push --force` on shared history as a routine release step.
+- Confirm `LICENSE` lists the desired copyright holder and that all included
+  contributions may be distributed under **MIT**.
+- Confirm the intended public C++ interfaces, CLI flags and CSV schema are
+  frozen for v1.0.0.
+- Review prior commits for secrets/private content (including original `.venv`,
+  `build*` and `results` files). A clean current tree does not remove old
+  files from Git history. **Revoke/rotate any exposed secret immediately.**
+- Do not rewrite shared history or force-push casually; coordinate first.
 
-Useful local checks:
+Remove the *previously tracked* Python bytecode from the Git index (local
+files are retained):
+
+```sh
+git rm -r --cached --ignore-unmatch scripts/__pycache__ tests/__pycache__
+```
+
+Our `.gitignore` already excludes these paths for future commits. Confirm no
+other cached or generated files remain in the tracked source tree:
+
+```sh
+git ls-files | grep -E '(^\.venv/|^build[^/]*/|^results/|(^|/)__pycache__/|\.pyc$)' || true
+```
+
+## 2. Commit the candidate and run local preflight
 
 ```sh
 git status --short
-git ls-files | grep -E '(^\.venv/|^build[^/]*/|^results/)' || true
+git add CMakeLists.txt README.md docs/RELEASING.md \
+  docs/RELEASE_NOTES_v1.0.0.md scripts/release_preflight.sh
+
+git commit -m "chore: prepare v1.0.0 release candidate"
+sh scripts/release_preflight.sh
 ```
 
-## 2. Test the exact release candidate
+`release_preflight.sh` checks repository hygiene and version/document presence,
+not license rights, historical secrets, compilation, or CI. Its successful
+exit is **necessary but not sufficient** for release.
+
+## 3. Test the exact candidate
 
 ```sh
 cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release
 cmake --build build-release --parallel 4
 ctest --test-dir build-release --output-on-failure
+
 python -m pip install -r requirements-analysis.txt
 python -m unittest discover -s tests -p 'test_analysis_*.py' -v
+
 ./build-release/ssd_sim --help
-```
-
-Expected at the time this document was authored: 34 CTest cases and 3 Python
-regression tests. Review counts if the suite changes.
-
-The automatic CI is Linux GCC/Clang + Python. Manual macOS CI is in
-`.github/workflows/macos-manual.yml` and can be queued/cancelled before running
-if GitHub-hosted runners are unavailable. A **cancelled or never-started** job
-must not be reported as a passing macOS CI test; record local Apple Clang
-results separately.
-
-## 3. Verify CLI examples and results
-
-```sh
 ./build-release/ssd_sim --blocks 32 --pages-per-block 16 \
   --logical-pages 480 --writes 10000 --workload hotcold \
   --policy wear-aware --lambda 0.05 --seed 42 \
   --csv results/release-smoke.csv
 ```
 
-Confirm the summary, WAF accounting, and CSV append behavior. Preserve seed,
-platform, and toolchain in any published comparison. The analyzer for
-`experiment_wear_weight` does **not** accept this 26-column CLI CSV.
+Expect **34 CTest** and **3 Python unittest** cases. The smoke run should
+report `Successful writes: 10000` and append one 26-column CSV data row. Run
+Debug CTest too when feasible; test the actual committed code, not older build
+artifacts.
 
-## 4. Finalize the actual version and changelog
+Use a clean checkout or a fresh CMake build directory for the final smoke.
+Avoid running the same CSV append command repeatedly if counting rows.
 
-- Update `project(... VERSION 0.1.0 ...)` in `CMakeLists.txt` to `1.0.0`
-  **only once the public v1.0 contract is ready**.
-- Update README status, supported platforms, CLI examples, and documentation.
-- Write release notes documenting scope, supported APIs, limitations, test
-  results, and any behavior change from pre-v1.0.
-- Commit and push the tested release candidate; verify CI for **that commit**.
+## 4. Verify GitHub CI for the release candidate commit
 
-## 5. Tag and publish deliberately
+```sh
+git push origin main
+git rev-parse HEAD
+```
 
-After reviewing the exact commit on `main` and verifying version/release notes:
+Confirm the Linux GCC/Clang Debug/Release + Python **5/5** CI checks passed
+for this exact SHA. The hosted macOS workflow is manual and may be cancelled
+before receiving a runner; such a result is not a macOS pass. Report local
+Apple Clang Debug/Release results separately.
+
+## 5. Publish only after sign-off
+
+Review the draft in `docs/RELEASE_NOTES_v1.0.0.md` and ensure the repository
+is clean, rights and history are reviewed, and all release checks pass.
 
 ```sh
 git status --short
+git rev-parse HEAD
 git tag -a v1.0.0 -m "SSD GC Simulator v1.0.0"
 git push origin v1.0.0
 ```
 
-Then create a release via the GitHub Releases interface (or `gh release
-create v1.0.0 --generate-notes` after reviewing notes). Do **not** execute the
-tag commands while the CMake version is still `0.1.0`.
+Create the GitHub Release for `v1.0.0`, using a reviewed copy of release notes:
 
-No binaries or installer artifacts are currently packaged by the project; the
-initial GitHub release can be source-only unless build packaging is added.
+```sh
+gh release create v1.0.0 \
+  --title "SSD GC Simulator v1.0.0" \
+  --notes-file docs/RELEASE_NOTES_v1.0.0.md
+```
+
+**Do not run these tag/release commands during candidate preparation.** A
+source-only release is sufficient; no pre-built executables are packaged.
