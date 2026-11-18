@@ -1,11 +1,16 @@
 # GitHub Actions CI — Checkpoint 10E
 
-This repository ships a CI workflow in `.github/workflows/ci.yml`.
-It runs on every push, pull request, or manual invocation (`Actions` → `CI` → `Run workflow`).
+This repository has two GitHub Actions workflows:
+
+- `.github/workflows/ci.yml`: **required Linux C++ + Python CI**. Runs on push, pull request, and manual invocation.
+- `.github/workflows/macos-manual.yml`: **manual macOS C++ CI**. Use Actions → macOS CI (manual) → Run workflow. Choose `macos-15-intel` (Intel x86_64) or `macos-15` (Apple Silicon arm64).
+
+The macOS workflow is manual because GitHub-hosted macOS arm64 jobs were repeatedly cancelled after ~15 minutes **without acquiring a runner or executing a single step** in November 2026. This is a runner-allocation issue, not a compilation or test failure. Intel is a diagnostic alternative, not a guaranteed fix. The normal CI stays green only when its actual Linux/Python tests pass; this does **not** certify macOS hosted CI.
 
 ## CI checks
 
-- **C++:** six configurations: Ubuntu 24.04 (GCC & Clang, Debug & Release) and macOS 15 (Apple Clang, Debug & Release). Each builds `ssd_sim` and runs the 34 CTest cases. Optional experiments remain disabled.
+- **C++ (automatic):** four Ubuntu 24.04 configurations (GCC & Clang, Debug & Release). Each builds `ssd_sim` and runs the 34 CTest cases. Optional experiments remain disabled.
+- **C++ (manual macOS):** two configurations (Apple Clang, Debug & Release) on a user-selected macOS 15 hosted runner; each runs the same 34 CTest cases, subject to hosted-runner availability.
 - **Python:** Ubuntu 24.04, Python 3.12; installs `requirements-analysis.txt`, checks Python syntax, then runs the three synthetic-data analysis regression tests.
 
 These jobs deliberately do **not** check numerical equality of the generated Random/HotCold workloads across standard libraries; seed reproducibility is only guaranteed within a fixed standard-library implementation.
@@ -58,6 +63,10 @@ git push -u origin main
 Use your real GitHub username in the URL. Authentication is handled by your Git credential manager or GitHub CLI; do not paste access tokens into the repository or chat.
 
 GitHub Actions will start after the workflow file is pushed. The first green run must be checked on the GitHub **Actions** tab; local tests alone do not confirm hosted CI works.
+
+## macOS runner allocation workaround
+
+If manual macOS jobs remain queued for about 15 minutes and end `cancelled`, inspect their job details. If there is **no runner name and no steps**, the tests never ran. Try a different runner pool later, or verify both Debug and Release on a local Mac. Do not mark hosted macOS checks as passing. Changing the runner to Intel tests x86_64 rather than Apple Silicon, so keep local arm64 validation as well.
 
 ## If CI fails
 
