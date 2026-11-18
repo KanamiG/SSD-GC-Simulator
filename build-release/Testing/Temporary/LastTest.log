@@ -1,0 +1,380 @@
+Start testing: Nov 18 23:39 CST
+----------------------------------------------------------
+1/22 Testing: block_basics
+1/22 Test: block_basics
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_block"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"block_basics" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] initial state
+[PASS] program and invalidate
+[PASS] invalid is not free
+[PASS] safe erase and reuse
+[PASS] boundary cases
+Passed 5/5 tests
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"block_basics" end time: Nov 18 23:39 CST
+"block_basics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/22 Testing: flash_basics
+2/22 Test: flash_basics
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_flash"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"flash_basics" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] geometry
+[PASS] initial block states
+[PASS] toPpn known values
+[PASS] fromPpn known values
+[PASS] round-trip conversions
+[PASS] zero geometry
+[PASS] block bounds
+[PASS] toPpn bounds
+[PASS] fromPpn bounds
+[PASS] multiplication overflow
+[PASS] physical program count / full flash
+[PASS] closed epoch lifecycle
+[PASS] invalidate / erase failure guarantees
+Passed 13/13 tests
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"flash_basics" end time: Nov 18 23:39 CST
+"flash_basics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/22 Testing: flash_program
+3/22 Test: flash_program
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_flash_program"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"flash_program" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] flash programming
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"flash_program" end time: Nov 18 23:39 CST
+"flash_program" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/22 Testing: flash_operations
+4/22 Test: flash_operations
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_flash_operations"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"flash_operations" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Flash operations
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"flash_operations" end time: Nov 18 23:39 CST
+"flash_operations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/22 Testing: ftl_basics
+5/22 Test: ftl_basics
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_ftl"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"ftl_basics" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] FTL basic mapping
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ftl_basics" end time: Nov 18 23:39 CST
+"ftl_basics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/22 Testing: ftl_update
+6/22 Test: ftl_update
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_ftl_update"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"ftl_update" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] FTL out-of-place update
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ftl_update" end time: Nov 18 23:39 CST
+"ftl_update" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/22 Testing: ftl_invariant
+7/22 Test: ftl_invariant
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_ftl_invariant"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"ftl_invariant" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Initial state
+[PASS] First write
+[PASS] Second write
+[PASS] Out-of-place update
+[PASS] Fill flash
+[PASS] Failed write rollback
+[PASS] Flash full consistency
+All FTL invariant tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ftl_invariant" end time: Nov 18 23:39 CST
+"ftl_invariant" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/22 Testing: gc_selection
+8/22 Test: gc_selection
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_selection"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_selection" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] GC victim selection
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gc_selection" end time: Nov 18 23:39 CST
+"gc_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/22 Testing: gc_migration
+9/22 Test: gc_migration
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_migration"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_migration" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] GC migration / complete GC API
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"gc_migration" end time: Nov 18 23:39 CST
+"gc_migration" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/22 Testing: gc_complete
+10/22 Test: gc_complete
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_complete"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_complete" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Complete GC
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gc_complete" end time: Nov 18 23:39 CST
+"gc_complete" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/22 Testing: gc_automatic
+11/22 Test: gc_automatic
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_automatic"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_automatic" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Automatic GC
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gc_automatic" end time: Nov 18 23:39 CST
+"gc_automatic" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/22 Testing: metrics
+12/22 Test: metrics
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_metrics"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"metrics" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] SSD Performance Metrics
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"metrics" end time: Nov 18 23:39 CST
+"metrics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/22 Testing: workload
+13/22 Test: workload
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_workload"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"workload" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Workload Generator
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"workload" end time: Nov 18 23:39 CST
+"workload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/22 Testing: benchmark
+14/22 Test: benchmark
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_benchmark"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"benchmark" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Benchmark Runner
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"benchmark" end time: Nov 18 23:39 CST
+"benchmark" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/22 Testing: csv_export
+15/22 Test: csv_export
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_csv_export"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"csv_export" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] CSV Export
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"csv_export" end time: Nov 18 23:39 CST
+"csv_export" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/22 Testing: gc_policy
+16/22 Test: gc_policy
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_policy"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_policy" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Greedy vs FIFO selection
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gc_policy" end time: Nov 18 23:39 CST
+"gc_policy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/22 Testing: gc_trace
+17/22 Test: gc_trace
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_trace"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_trace" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] GC Event Tracing
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gc_trace" end time: Nov 18 23:39 CST
+"gc_trace" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/22 Testing: wear_aware_score
+18/22 Test: wear_aware_score
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_wear_aware_score"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"wear_aware_score" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Wear-aware score
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wear_aware_score" end time: Nov 18 23:39 CST
+"wear_aware_score" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/22 Testing: gc_wear_aware
+19/22 Test: gc_wear_aware
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_wear_aware"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_wear_aware" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Wear-aware FTL integration
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gc_wear_aware" end time: Nov 18 23:39 CST
+"gc_wear_aware" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/22 Testing: gc_wear_effect
+20/22 Test: gc_wear_effect
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_wear_effect"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_wear_effect" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Wear-aware changes victim selection
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gc_wear_effect" end time: Nov 18 23:39 CST
+"gc_wear_effect" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/22 Testing: wear_aware_equivalence
+21/22 Test: wear_aware_equivalence
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_wear_aware_equivalence"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"wear_aware_equivalence" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] Lambda zero equivalence
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"wear_aware_equivalence" end time: Nov 18 23:39 CST
+"wear_aware_equivalence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/22 Testing: gc_regression
+22/22 Test: gc_regression
+Command: "/Users/kanami/SSD-GC-Simulator/build-release/test_gc_regression"
+Directory: /Users/kanami/SSD-GC-Simulator/build-release
+"gc_regression" start time: Nov 18 23:39 CST
+Output:
+----------------------------------------------------------
+[PASS] GC regression: 12 sustained-workload cases, capacity rejection, no-victim safety
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"gc_regression" end time: Nov 18 23:39 CST
+"gc_regression" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 18 23:39 CST

@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpp:
+    name: C++ / ${{ matrix.os }} / ${{ matrix.compiler }} / ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      CXX: ${{ matrix.compiler }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, compiler: g++,       build_type: Debug }
+          - { os: ubuntu-24.04, compiler: g++,       build_type: Release }
+          - { os: ubuntu-24.04, compiler: clang++,   build_type: Debug }
+          - { os: ubuntu-24.04, compiler: clang++,   build_type: Release }
+          - { os: macos-15,     compiler: clang++,   build_type: Debug }
+          - { os: macos-15,     compiler: clang++,   build_type: Release }
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Show toolchain
+        run: |
+          cmake --version
+          $CXX --version
+
+      - name: Configure
+        run: |
+          cmake -S . -B build-ci \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DBUILD_TESTING=ON \
+            -DSSD_BUILD_EXPERIMENTS=OFF
+
+      - name: Build
+        run: cmake --build build-ci --parallel 2
+
+      - name: Run C++ tests
+        run: ctest --test-dir build-ci --output-on-failure
+
+  python:
+    name: Python analysis / 3.12
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-analysis.txt
+
+      - name: Install analysis dependencies
+        run: python -m pip install -r requirements-analysis.txt
+
+      - name: Check Python source syntax
+        run: python -m compileall -q scripts tests/test_analysis_wear_weight.py
+
+      - name: Run Python analysis regression tests
+        run: python -m unittest discover -s tests -p 'test_analysis_*.py' -v

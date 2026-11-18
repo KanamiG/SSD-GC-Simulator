@@ -1,0 +1,22 @@
+block_basics 3 0.200927
+flash_basics 3 0.0809253
+flash_program 3 0.0748359
+flash_operations 3 0.0706535
+ftl_basics 3 0.0717592
+ftl_update 3 0.0727541
+ftl_invariant 3 0.0749445
+gc_selection 3 0.073779
+gc_migration 3 0.0727964
+gc_complete 3 0.0721945
+gc_automatic 3 0.0724281
+metrics 3 0.0800024
+workload 3 0.0905931
+benchmark 3 0.0728092
+csv_export 3 0.073871
+gc_policy 3 0.0754111
+gc_trace 3 0.0721376
+wear_aware_score 3 0.0768312
+gc_wear_aware 3 0.0728953
+gc_wear_effect 3 0.0726039
+wear_aware_equivalence 3 0.187245
+---

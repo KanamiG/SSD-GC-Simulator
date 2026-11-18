@@ -1,0 +1,4 @@
+build/
+build-llvm/
+.DS_Store
+.vscode/

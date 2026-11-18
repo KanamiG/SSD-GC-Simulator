@@ -1,0 +1,4 @@
+# Optional dependencies for scripts/analyze_*.py and plotting
+numpy>=1.26
+pandas>=2.1
+matplotlib>=3.8
