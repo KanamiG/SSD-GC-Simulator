@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/test_csv_export.dir/tests/test_csv_export.cpp.o -o test_csv_export  libssd_core.a

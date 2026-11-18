@@ -1,2 +1,0 @@
-blocks,pages_per_block,physical_pages,ftl_logical_capacity,logical_pages,writes_requested,workload,policy,lambda,seed,hot_set_size,hot_probability,attempted,successful,failed,success_rate,waf,host_page_programs,gc_migration_programs,physical_programs,gc_cycles,block_erases,max_erases,erase_cv,mapped_logical_pages,free_physical_pages
-truncated,row

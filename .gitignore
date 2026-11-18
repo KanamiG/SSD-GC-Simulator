@@ -1,4 +1,20 @@
-build/
-build-llvm/
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# CMake
+build*/
+cmake-build-*/
+
+# Generated benchmark results
+results/
+/benchmark_results*.csv
+/gc_event_trace.csv
+/policy_comparison.csv
+/utilization_comparison.csv
+
+# Local editor and OS
 .DS_Store
 .vscode/

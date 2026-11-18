@@ -1,4 +1,0 @@
-workload,seed,operations,logical_pages,blocks,pages_per_block,attempted,successful,failed,success_rate,host_writes,gc_writes,physical_programs,gc_cycles,block_erases,waf
-Sequential,42,10000,200,32,16,10000,10000,0,1,10000,0,10000,594,594,1
-Random,42,10000,200,32,16,10000,10000,0,1,10000,873,10873,649,649,1.0873
-HotCold,42,10000,200,32,16,10000,10000,0,1,10000,2423,12423,746,746,1.2423

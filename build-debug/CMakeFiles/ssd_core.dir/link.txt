@@ -1,2 +1,0 @@
-/usr/bin/ar qc libssd_core.a CMakeFiles/ssd_core.dir/src/block.cpp.o CMakeFiles/ssd_core.dir/src/flash.cpp.o CMakeFiles/ssd_core.dir/src/ftl.cpp.o CMakeFiles/ssd_core.dir/src/workload.cpp.o CMakeFiles/ssd_core.dir/src/benchmark.cpp.o CMakeFiles/ssd_core.dir/src/csv_export.cpp.o
-/usr/bin/ranlib libssd_core.a

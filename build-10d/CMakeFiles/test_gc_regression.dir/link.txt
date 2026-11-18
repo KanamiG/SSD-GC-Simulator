@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/test_gc_regression.dir/tests/test_gc_regression.cpp.o -o test_gc_regression  libssd_core.a
