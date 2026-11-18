@@ -6,7 +6,7 @@ A **C++20 educational SSD garbage-collection simulator** with a page-mapped
 flash translation layer (FTL), three garbage-collection policies, configurable
 write workloads, a command-line interface, and CSV export.
 
-**Status:** **v1.0.0 release** (`project(... VERSION 1.0.0)` in CMake). The v1.0.0 Git tag and GitHub Release have **not** yet been published.
+**Status:** **Version:** 1.0.0 (first stable source release).
 This is an **in-memory, metadata-only simulation**, not a NAND controller,
 hardware emulator, or model of SSD performance in real time.
 
