@@ -1,57 +1,50 @@
-# SSD GC Simulator v1.0.0 — draft release notes
+# SSD GC Simulator v1.0.0
 
-> **Release candidate only.** This document is a draft; no GitHub Release or
-> `v1.0.0` tag has been created by this change.
+First source-only release of an educational **C++20 SSD garbage-collection simulator**. The project models page-mapped FTL metadata and out-of-place writes, rather than physical NAND latency or real SSD hardware.
 
-## Overview
+## Included in this release
 
-First source-only release candidate for a C++20 **educational, in-memory,
-metadata-only** SSD garbage-collection simulator. This is not a timing-accurate
-NAND/SSD controller model, hardware emulator, or device lifetime predictor.
+- Page-mapped Flash Translation Layer (FTL), sequential physical page programming, page invalidation, and block erasure.
+- Three GC victim-selection policies: **Greedy**, **FIFO**, and **Wear-aware Greedy**.
+- **Sequential**, **Random**, and **HotCold** write workloads.
+- Configurable `ssd_sim` CLI for geometry, workload, policy, wear weight (lambda), write count, and random seed.
+- CSV export of per-run configuration and 26 result fields; optional research experiments and Python analysis.
+- **34 CTest cases** and **3 Python regression tests**.
 
-## What is included
+## Build and run
 
-- Page-mapped FTL with out-of-place logical writes and physical block erases.
-- Three GC victim-selection policies: Greedy, FIFO, Wear-aware Greedy.
-- Sequential, Random and HotCold workloads, configurable CLI, reproducible
-  seeds **within the same C++ standard-library implementation**.
-- Per-run WAF, physical programs, GC migrations, GC cycles, erase statistics.
-- `ssd_sim --csv` append-only result export with 26 defined columns.
-- Separate opt-in research experiments and Python statistical analysis.
-- 34 CTest cases and 3 Python regression tests.
-- Linux GCC/Clang Debug/Release and Python automatic GitHub Actions checks;
-  macOS manual hosted workflow (Runner availability permitting).
+Requires **CMake 3.16+** and a **C++20** compiler.
 
-## Compatibility and requirements
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel 4
+ctest --test-dir build --output-on-failure
+./build/ssd_sim --help
+```
 
-- CMake 3.16+ and a compiler supporting C++20.
-- Optional Python 3.12, NumPy, pandas and Matplotlib for wear-weight analysis.
-- Source-only GitHub Release: no pre-built binaries, installer or stable CMake
-  package export is promised.
+Example:
 
-## Deliberate limitations
+```sh
+./build/ssd_sim \
+  --blocks 32 --pages-per-block 16 --logical-pages 480 \
+  --writes 10000 --workload hotcold --policy wear-aware \
+  --lambda 0.05 --seed 42 --csv results/cli_runs.csv
+```
 
-- No NAND latency, payloads, reads/trim, ECC, power-loss recovery, concurrent
-  I/O, flash wear-out failures or production SSD allocation model.
-- Workload RNG distributions are not guaranteed to generate identical streams
-  across different standard library implementations, even with the same seed.
-- WAF and erase-count CV are simulation metrics; not measured endurance or
-  performance predictions.
-- The CLI 26-column CSV is **not compatible** with the historical
-  `wear_weight_sensitivity.csv` analysis schema.
+## Testing and portability
 
-## Validation to complete before publishing
+The release-candidate commit `b714fb42601d33366b6e246bc517e2714382f536` passed GitHub Actions checks for Linux GCC and Clang (Debug and Release) and Python analysis (five successful jobs). The project was also tested locally using Apple Clang on macOS. Hosted macOS testing remains a separate manually triggered workflow due to runner-availability problems; it is **not claimed as a passing cloud CI job**.
 
-- [ ] Verify copyright holder and confirm rights to release all included code
-      under the MIT License.
-- [ ] Remove tracked `.pyc`/`__pycache__` and other generated files from `main`.
-- [ ] Run `scripts/release_preflight.sh` with a clean local Git worktree.
-- [ ] Verify Linux GitHub Actions CI passes for the **release candidate commit**.
-- [ ] Confirm local macOS Debug/Release testing results separately if hosted
-      macOS jobs are still unavailable.
-- [ ] Verify CLI help, representative simulation and CSV append operation.
-- [ ] Audit Git history for secrets or private content and rotate anything
-      exposed. Removing files from HEAD does **not** remove them from history.
-- [ ] Confirm `v1.0.0` points to the final validated commit before publication.
+Random distributions may produce different sequences across C++ standard-library implementations, so the same seed alone does not guarantee identical cross-platform results.
 
-See [release checklist](RELEASING.md) for the commands and detailed process.
+## Scope and limitations
+
+This is a **metadata-only educational model**, not a production SSD controller or a NAND timing simulator. It does not model I/O latency, ECC, channels, data payloads, reads/trim, power-loss recovery, concurrent operations, or wear-out failures. WAF and erase-count variation should not be interpreted as real-device performance or lifetime predictions.
+
+The 26-column CLI CSV format is distinct from the historical CSV expected by the wear-weight research analysis script. See `README.md`, `docs/DESIGN.md`, and `docs/METRICS.md` for details.
+
+## Licensing
+
+Released under the **MIT License**; see `LICENSE`.
+
+**Distribution:** source-only. No prebuilt binaries or installer packages are included.
